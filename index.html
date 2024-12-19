@@ -30,7 +30,16 @@
       width: 100%;
       max-width: 400px;
     }
-
+    .logo {
+      position: absolute;
+      top: -30px;
+      left: 20px;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 50px;
+    }
     .container h4 {
       text-align: center;
       color: #007bff;
@@ -102,10 +111,10 @@
   </style>
 </head>
 <body>
-
+  <img src="logo.png" alt="Logo" class="logo">
 <div class="container">
-  <!-- Standard Plan Heading -->
-  <div class="plan">Standard Plan</div>
+  <!-- Atithidev Standard Plan -->
+  <div class="plan">Atithidev Standard Plan</div>
   <h4>Secure Payment</h4>
 
   <!-- Form Fields -->
@@ -118,16 +127,15 @@
   <label for="mobile">Mobile Number:</label>
   <input type="text" id="mobile" name="mobile" placeholder="Enter your mobile number" required>
 
-  <!-- New Host ID Field -->
   <label for="hostId">Referral ID:</label>
   <input type="text" id="hostId" name="hostId" placeholder="Enter Referral ID" required>
 
   <label for="guests">Number of Guests:</label>
-  <input type="number" id="guests" name="guests" min="1" value="1" onchange="calculateAmount()">
+  <input type="number" id="guests" name="guests" min="0" placeholder="Enter number of guests" onchange="calculateAmount()">
 
   <!-- Total Amount Display -->
   <div class="amount-display">
-    Total Amount: ₹<span id="total-amount">9000</span>
+    Total Amount: ₹<span id="total-amount">0</span>
   </div>
 
   <button onclick="submitPaymentForm()">Proceed to Pay</button>
@@ -142,36 +150,29 @@
     const guests = parseInt(document.getElementById('guests').value) || 0;
     let perGuestCost = baseGuestCost;
 
-    // Apply cost logic
+    // Adjust per guest cost based on the number of guests
     if (guests > 450) {
       perGuestCost = 60;
     } else if (guests > 250) {
       perGuestCost = 90;
     }
 
-    const totalAmount = setupCost + (perGuestCost * guests);
+    const totalAmount = guests > 0 ? setupCost + (perGuestCost * guests) : 0;
     document.getElementById('total-amount').innerText = totalAmount;
   }
 
-  // Clear previously stored form data and reset fields
   document.addEventListener('DOMContentLoaded', function () {
-    localStorage.clear();
-    sessionStorage.clear();
-    document.cookie = '';
-    document.querySelector('form')?.reset();
-    calculateAmount();
+    calculateAmount(); // Ensure initial amount is zero
   });
 
-  // Submit the payment form
   async function submitPaymentForm() {
     const name = document.getElementById('name').value.trim();
     const email = document.getElementById('email').value.trim();
     const mobile = document.getElementById('mobile').value.trim();
     const hostId = document.getElementById('hostId').value.trim();
-    const guests = parseInt(document.getElementById('guests').value);
+    const guests = parseInt(document.getElementById('guests').value) || 0;
     const amount = document.getElementById('total-amount').innerText;
 
-    // Validation
     if (!name || !email || !mobile || !hostId || guests <= 0) {
       alert('Please fill in all fields correctly.');
       return;
@@ -188,7 +189,7 @@
 
       const data = await response.json();
       if (data.url) {
-        window.location.href = data.url; // Redirect to payment URL
+        window.location.href = data.url;
       } else {
         alert('Failed to initiate payment. Please try again.');
       }
